@@ -188,7 +188,7 @@ export const experienceContent = {
 export const contactContent = {
   title: "Contact Portal",
   summary: "Open a channel if you want to collaborate on full-stack products, AI-powered tools, backend systems, or startup-grade web platforms.",
-  resumeHref: "/resume3.pdf",
+  resumeHref: "/resume.pdf",
   links: [
     {
       label: "Email",
