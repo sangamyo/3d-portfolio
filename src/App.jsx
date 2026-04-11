@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { Float, Html, OrbitControls, Sparkles, Stars } from "@react-three/drei";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Color } from "three";
 import Scene from "./components/Scene";
 import {
@@ -20,6 +20,59 @@ const sectionContent = {
   experience: experienceContent,
   contact: contactContent,
 };
+
+const defaultPanelPositions = {
+  hero: { x: 0, y: 0 },
+  nav: { x: 0, y: 0 },
+  story: { x: 0, y: 0 },
+};
+
+function useDraggablePanels() {
+  const [positions, setPositions] = useState(defaultPanelPositions);
+  const dragState = useRef(null);
+
+  useEffect(() => {
+    const handlePointerMove = (event) => {
+      if (!dragState.current) return;
+
+      const { panel, startX, startY, originX, originY } = dragState.current;
+      setPositions((current) => ({
+        ...current,
+        [panel]: {
+          x: originX + event.clientX - startX,
+          y: originY + event.clientY - startY,
+        },
+      }));
+    };
+
+    const handlePointerUp = () => {
+      dragState.current = null;
+      document.body.classList.remove("is-dragging-panel");
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, []);
+
+  const startDrag = (panel) => (event) => {
+    if (window.innerWidth <= 700) return;
+    dragState.current = {
+      panel,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: positions[panel].x,
+      originY: positions[panel].y,
+    };
+    document.body.classList.add("is-dragging-panel");
+  };
+
+  return { positions, startDrag };
+}
 
 function StorySection({ title, children }) {
   return (
@@ -43,16 +96,29 @@ function IntroBillboard() {
   );
 }
 
-function StoryPanel({ activeSection, onClose }) {
+function DragGrip({ label, onPointerDown }) {
+  return (
+    <div className="drag-grip" onPointerDown={onPointerDown}>
+      <span className="drag-dots" />
+      <span>{label}</span>
+    </div>
+  );
+}
+
+function StoryPanel({ activeSection, onClose, position, onDragStart }) {
   if (!activeSection) return null;
 
   const meta = sectionMeta[activeSection];
   const content = sectionContent[activeSection];
 
   return (
-    <aside className="story-panel">
+    <aside
+      className="story-panel draggable-panel"
+      style={{ "--panel-x": `${position.x}px`, "--panel-y": `${position.y}px` }}
+    >
       <div className="story-panel-top">
         <div>
+          <DragGrip label="Drag Panel" onPointerDown={onDragStart} />
           <p className="eyebrow">{meta.kicker}</p>
           <h2>{content.title}</h2>
         </div>
@@ -204,10 +270,14 @@ function StoryPanel({ activeSection, onClose }) {
   );
 }
 
-function HeroPanel({ onJump, activeSection }) {
+function HeroPanel({ onJump, activeSection, positions, onDragStart }) {
   return (
     <div className="hud">
-      <div className="hero-copy">
+      <div
+        className="hero-copy draggable-panel"
+        style={{ "--panel-x": `${positions.hero.x}px`, "--panel-y": `${positions.hero.y}px` }}
+      >
+        <DragGrip label="Drag Panel" onPointerDown={onDragStart("hero")} />
         <p className="eyebrow">{heroContent.kicker}</p>
         <div className="anime-tag">Anime UI Mode</div>
         <h1>
@@ -223,9 +293,15 @@ function HeroPanel({ onJump, activeSection }) {
         </div>
       </div>
 
-      <aside className="control-panel">
+      <aside
+        className="control-panel draggable-panel"
+        style={{ "--panel-x": `${positions.nav.x}px`, "--panel-y": `${positions.nav.y}px` }}
+      >
         <div className="panel-header">
-          <p className="panel-title">Story Scroll</p>
+          <div>
+            <DragGrip label="Drag Panel" onPointerDown={onDragStart("nav")} />
+            <p className="panel-title">Story Scroll</p>
+          </div>
           <span className="panel-caption">Open a chapter</span>
         </div>
         <div className="nav-scroll">
@@ -268,35 +344,48 @@ function EnvironmentEffects() {
 export default function App() {
   const [activeSection, setActiveSection] = useState(null);
   const modalOpen = Boolean(activeSection);
+  const { positions, startDrag } = useDraggablePanels();
 
   return (
     <div className="app-shell">
       <div className={modalOpen ? "ui-layer dimmed" : "ui-layer"}>
-        <HeroPanel onJump={setActiveSection} activeSection={activeSection} />
+        <HeroPanel
+          onJump={setActiveSection}
+          activeSection={activeSection}
+          positions={positions}
+          onDragStart={startDrag}
+        />
       </div>
 
-      <Canvas camera={{ position: [0, 4, 11], fov: 42 }}>
-        <Suspense fallback={null}>
-          <EnvironmentEffects />
-          <Scene activeSection={activeSection} onSelect={setActiveSection} modalOpen={modalOpen} />
-          <OrbitControls
-            enablePan={false}
-            enableZoom={false}
-            minPolarAngle={Math.PI / 3}
-            maxPolarAngle={Math.PI / 2.05}
-            minAzimuthAngle={-0.8}
-            maxAzimuthAngle={0.8}
-            target={[0, 2.2, 0]}
-          />
-        </Suspense>
-      </Canvas>
+      <div className="scene-shell">
+        <Canvas camera={{ position: [0, 4, 11], fov: 42 }}>
+          <Suspense fallback={null}>
+            <EnvironmentEffects />
+            <Scene activeSection={activeSection} onSelect={setActiveSection} modalOpen={modalOpen} />
+            <OrbitControls
+              enablePan={false}
+              enableZoom={false}
+              minPolarAngle={Math.PI / 3}
+              maxPolarAngle={Math.PI / 2.05}
+              minAzimuthAngle={-0.8}
+              maxAzimuthAngle={0.8}
+              target={[0, 2.2, 0]}
+            />
+          </Suspense>
+        </Canvas>
 
-      <div className={modalOpen ? "footer-bar dimmed" : "footer-bar"}>
-        <span>Click any glowing object inside the room</span>
-        <span>Built with React + Three.js + React Three Fiber</span>
+        <div className={modalOpen ? "footer-bar dimmed" : "footer-bar"}>
+          <span>Click any glowing object inside the room</span>
+          <span>Built with React + Three.js + React Three Fiber</span>
+        </div>
       </div>
 
-      <StoryPanel activeSection={activeSection} onClose={() => setActiveSection(null)} />
+      <StoryPanel
+        activeSection={activeSection}
+        onClose={() => setActiveSection(null)}
+        position={positions.story}
+        onDragStart={startDrag("story")}
+      />
     </div>
   );
 }

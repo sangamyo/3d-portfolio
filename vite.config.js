@@ -3,8 +3,8 @@ import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "url";
 
 export default defineConfig({
-  // Base for GitHub Pages (change if your repo name differs)
-  base: "/3d-portfolio/",
+  // Base path: "/" for Vercel, "/3d-portfolio/" for GitHub Pages
+  base: "/",
   plugins: [react()],
   resolve: {
     alias: {
