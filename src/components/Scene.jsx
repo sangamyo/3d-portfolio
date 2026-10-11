@@ -51,7 +51,7 @@ function NeonFrame() {
         anchorX="center"
         anchorY="middle"
       >
-        AI DEVELOPER | PROBLEM SOLVER
+        AI ENGINEER | SOFTWARE ENGINEER
       </Text>
       <Text
         position={[0, -0.2, 0.2]}
