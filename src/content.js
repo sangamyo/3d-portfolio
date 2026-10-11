@@ -42,7 +42,7 @@ export const aboutContent = {
     "I’m a full stack developer focused on building production-ready web platforms, AI-powered tools, and scalable backend systems. My work combines engineering fundamentals, product thinking, and performance-driven execution.",
   stats: [
     { label: "Active Users Served", value: "500+" },
-    { label: "Startup Funding", value: "INR 1L+" },
+    { label: "Vendor Workflows", value: "15+" },
     { label: "Latency Improvement", value: "40%" },
     { label: "API Speed Gain", value: "50%" },
   ],
@@ -77,13 +77,31 @@ export const aboutContent = {
     },
   ],
   achievements: [
-    "Secured INR 1L+ funding and Startup India recognition for the PureWashr platform.",
+    "Built PureWashr's MERN platform (a Startup India recognised startup), serving 500+ active users.",
     "Built multiple AI-driven systems including an AI desktop assistant and adaptive traffic automation simulation.",
     "Certified in Java and Problem Solving through Apna College.",
   ],
 };
 
 export const projects = [
+  {
+    label: "Multimodal RAG",
+    title: "PDF RAG Chat",
+    description:
+      "A chatbot that answers questions from the text, tables, charts and images inside PDFs, with page citations. A vision LLM describes charts at ingest, and hybrid retrieval combines bge-small embeddings with BM25 via reciprocal rank fusion.",
+    stack: ["Python", "Groq (Qwen 3.8)", "PyMuPDF", "fastembed", "BM25", "Streamlit"],
+    demo: "https://pdf-rag-chat-hariom.streamlit.app",
+    repo: "https://github.com/sangamyo/pdf-rag-chat",
+  },
+  {
+    label: "In-Browser RAG",
+    title: "RAG Chat (in-browser)",
+    description:
+      "Ask questions about your PDFs and notes with cited answers. Retrieval and the LLM both run in your browser: bge-small embeddings, hybrid BM25 + vector search, and Qwen2.5 / Llama 3.2 on WebGPU, with a grounding check on every answer.",
+    stack: ["JavaScript", "transformers.js", "WebLLM", "WebGPU", "BM25", "pdf.js"],
+    demo: "https://sangamyo.github.io/rag-chat/",
+    repo: "https://github.com/sangamyo/rag-chat",
+  },
   {
     label: "DSA Analytics Platform",
     title: "AlgoFlow Tracker",
@@ -108,7 +126,7 @@ export const projects = [
     description:
       "An adaptive traffic control system based on vehicle density algorithms and real-time signal optimization, simulated in Python and Pygame.",
     stack: ["Python", "Pygame", "Simulation", "Optimization"],
-    demo: "https://github.com/sangamyo/sangamyo-sangamyo-Synchronet-Traffic-Simulation-with-stats.git",
+    demo: "https://sangamyo.github.io/sangamyo-sangamyo-Synchronet-Traffic-Simulation-with-stats/",
     repo: "https://github.com/sangamyo/sangamyo-sangamyo-Synchronet-Traffic-Simulation-with-stats.git",
   },
   {
@@ -117,7 +135,7 @@ export const projects = [
     description:
       "A vision-based multimodal control system using OpenCV and MediaPipe for touchless interaction with gesture and voice support.",
     stack: ["OpenCV", "MediaPipe", "Python", "Accessibility"],
-    demo: "https://github.com/sangamyo/control_with_hand_gesture.git",
+    demo: "https://sangamyo.github.io/control_with_hand_gesture/",
     repo: "https://github.com/sangamyo/control_with_hand_gesture.git",
   },
 ];
